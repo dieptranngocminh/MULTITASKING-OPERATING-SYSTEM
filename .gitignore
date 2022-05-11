@@ -7,3 +7,4 @@ obj/paging.o
 *.o
 mem
 os
+*.o

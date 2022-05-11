@@ -12,7 +12,7 @@ void enqueue(struct queue_t * q, struct pcb_t * proc) {
 		 q->proc[0] = proc;
 		 q->size += 1;
 	 }
-	 else if (q->size = MAX_QUEUE_SIZE){
+	 else if (q->size == MAX_QUEUE_SIZE){
 		 // TODO: Neu het cho thi lam gi ta
 	 } 
 	 else{
@@ -29,7 +29,7 @@ struct pcb_t * dequeue(struct queue_t * q) {
 	// return proc co prority cao nhat bang cach search / sap xep queue
 	if (!empty(q)){//Neu q ko trong nghia la co proc
 		uint32_t highest = q->proc[0]->priority;
-		uint32_t high_pid = q->proc[0]->pid;
+		//uint32_t high_pid = q->proc[0]->pid;
 		size_t ind = 0;
 
 		//Queue FIFO so when you reach the highest first time, that mean it go out first
@@ -38,11 +38,18 @@ struct pcb_t * dequeue(struct queue_t * q) {
 			if(highest < q->proc[i]->priority){
 				
 				highest = q->proc[i]->priority;
-				high_pid = q->proc[i]->pid;
+				//high_pid = q->proc[i]->pid;
 				ind = i;
 			}
 		}
-		return q->proc[ind];
+		struct pcb_t * max_PCB = q->proc[ind];
+		for ( int i = ind ; i < q->size -1 ; i++){
+			q->proc[i] = q->proc[i+1];
+		
+		}
+		q->proc[q->size - 1] = NULL;
+		q->size -= 1;
+		return max_PCB;
 	}
 	return NULL;
 }

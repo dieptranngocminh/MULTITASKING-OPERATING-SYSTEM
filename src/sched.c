@@ -27,12 +27,16 @@ struct pcb_t * get_proc(void) {
 	pthread_mutex_lock(&queue_lock);
 	if (empty(&ready_queue)){
 		//Let push all process in run_queue to ready_queue
-		for ( int i = 0; i< run_queue.size;i++){
-		enqueue(&ready_queue,&run_queue.proc[i]);
+		while (!empty(&run_queue)) {
+			enqueue(&ready_queue, dequeue(&run_queue));
 		}
 	}
+	
+	if (!empty(&ready_queue)){
+		proc = dequeue(&ready_queue);
+	}
 	pthread_mutex_unlock(&queue_lock);	
-	return dequeue(&ready_queue);
+	return proc;
 }
 
 void put_proc(struct pcb_t * proc) {
