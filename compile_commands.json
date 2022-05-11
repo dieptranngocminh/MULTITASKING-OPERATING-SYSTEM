@@ -1,0 +1,16 @@
+[
+    {
+        "arguments": [
+            "gcc",
+            "-c",
+            "-Iinclude",
+            "-Wall",
+            "-g",
+            "-o",
+            "obj/mem.o",
+            "src/mem.c"
+        ],
+        "directory": "/mnt/c/Users/84967/OneDrive/Documents/MINH DI\u1ec6P/Computer engineering/OS/gui_sv_assignment-Copy-2/gui_sv_assignment2/source_code",
+        "file": "src/mem.c"
+    }
+]
