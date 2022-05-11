@@ -175,8 +175,34 @@ int free_mem(addr_t address, struct pcb_t * proc) {
 	 * 	  the process [proc].
 	 * 	- Remember to use lock to protect the memory from other
 	 * 	  processes.  */
-	_mem_stat->proc = 0;	
-	return 0;
+	// _mem_stat->proc = 0;	
+	// return 0;
+	pthread_mutex_lock(&mem_lock);
+	/* The first layer index */
+	addr_t first_lv = get_first_lv(address);
+	/* The second layer index */
+	addr_t second_lv = get_second_lv(address);
+	/* First frame to free */
+	addr_t frame_index = proc->seg_table->table[first_lv].pages->table[second_lv].p_index;
+
+	int  allow_to_free = 1;
+	/* If the address not pointing to the first address of the allocated block*/
+	if(_mem_stat[frame_index].index != 0) allow_to_free = 0;
+	/* We also not allow to free other processes' memory */
+	if(_mem_stat[frame_index].proc != proc->pid) allow_to_free = 0;
+	/* Not to free the space that have not been allocated yet */
+	if(_mem_stat[frame_index].proc == 0) allow_to_free = 0;
+
+	while (allow_to_free)
+	{
+		_mem_stat[frame_index].proc = 0;
+		frame_index = _mem_stat[frame_index].next;
+		if (frame_index == -1)
+			break;
+	}
+	pthread_mutex_unlock(&mem_lock);
+
+	return allow_to_free;
 }
 
 int read_mem(addr_t address, struct pcb_t * proc, BYTE * data) {
