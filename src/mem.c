@@ -24,9 +24,9 @@ void init_mem(void) {
 }
 
 /* get offset of the virtual address */
-// static addr_t get_offset(addr_t addr) {
-// 	return addr & ~((~0U) << OFFSET_LEN);
-// }
+static addr_t get_offset(addr_t addr) {
+	return addr & ~((~0U) << OFFSET_LEN);
+}
 
 /* get the first layer index */
 static addr_t get_first_lv(addr_t addr) {
@@ -151,13 +151,13 @@ addr_t alloc_mem(uint32_t size, struct pcb_t * proc) {
 			addr_t first_lv = get_first_lv(proc->bp);//virtual_addr = break pointer
 			addr_t second_lv = get_second_lv(proc->bp);
 			if(proc->seg_table->table->pages == NULL){
-				proc->seg_table->table[first_lv]->pages = (struct page_table_t*) malloc(sizeof(struct page_table_t));
-				proc->seg_table->table[first_lv]->pages->size = 1 << PAGE_LEN;
+				proc->seg_table->table[first_lv].pages = (struct page_table_t*) malloc(sizeof(struct page_table_t));
+				proc->seg_table->table[first_lv].pages->size = 1 << PAGE_LEN;
 			}
 			proc->bp += PAGE_SIZE;
 			proc->seg_table->table[first_lv].v_index = first_lv;
-			proc->seg_table->table[first_lv]->pages->table[second_lv].v_index = second_lv;
-			proc->seg_table->table[first_lv]->pages->table[second_lv].p_index = avail_page[i];
+			proc->seg_table->table[first_lv].pages->table[second_lv].v_index = second_lv;
+			proc->seg_table->table[first_lv].pages->table[second_lv].p_index = avail_page[i];
 		}
 		
 	}
