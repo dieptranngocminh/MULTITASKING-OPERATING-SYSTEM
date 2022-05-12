@@ -90,7 +90,7 @@ static int translate(
 			 * to [p_index] field of page_table->table[i] to 
 			 * produce the correct physical address and save it to
 			 * [*physical_addr]  */
-			
+			if(_mem_stat[page_table->table[i].p_index].proc != proc->pid) return 0;
 			*physical_addr = (page_table->table[i].p_index << OFFSET_LEN) | offset;
 			return 1;
 		}
@@ -118,7 +118,8 @@ addr_t alloc_mem(uint32_t size, struct pcb_t * proc) {
 	 * For virtual memory space, check bp (break pointer).
 	 * */
 	//TODO
-	int* avail_page =  (int*) malloc(num_pages * sizeof(int));
+	proc->seg_table->size = 1 << SEGMENT_LEN;
+	int* avail_page =  (int*) malloc((num_pages+1) * sizeof(int));
 	int count=0; //count the number of empty pages
 	for(int i=0; i<NUM_PAGES; i++){
 		if(_mem_stat[i].proc == 0){
@@ -130,7 +131,7 @@ addr_t alloc_mem(uint32_t size, struct pcb_t * proc) {
 			break;
 		}
 	}
-	if((proc->bp + PAGE_SIZE*num_pages) > RAM_SIZE-1) mem_avail = 0;
+	if((proc->bp + PAGE_SIZE*num_pages) > RAM_SIZE) mem_avail = 0;
 	if (mem_avail) {
 		/* We could allocate new memory region to the process */
 		ret_mem = proc->bp;
@@ -142,7 +143,8 @@ addr_t alloc_mem(uint32_t size, struct pcb_t * proc) {
 		 * 	  to ensure accesses to allocated memory slot is
 		 * 	  valid. */
 		//TODO
-		for(int i=0; i<num_pages; i++){
+		int i;
+		for(i=0; i<num_pages; i++){
 			_mem_stat[avail_page[i]].proc = proc->pid;
 			_mem_stat[avail_page[i]].index = i;
 			if(i == num_pages-1) _mem_stat[i].next = -1;
@@ -159,7 +161,7 @@ addr_t alloc_mem(uint32_t size, struct pcb_t * proc) {
 			proc->seg_table->table[first_lv].pages->table[second_lv].v_index = second_lv;
 			proc->seg_table->table[first_lv].pages->table[second_lv].p_index = avail_page[i];
 		}
-		
+		_mem_stat[avail_page[i-1]].next = -1;
 	}
 	free(avail_page);
 	pthread_mutex_unlock(&mem_lock);
