@@ -91,7 +91,7 @@ static int translate(
 			 * produce the correct physical address and save it to
 			 * [*physical_addr]  */
 			if(_mem_stat[page_table->table[i].p_index].proc != proc->pid) return 0;
-			*physical_addr = (page_table->table[i].p_index << OFFSET_LEN) | offset;
+				*physical_addr = (page_table->table[i].p_index << OFFSET_LEN) | offset;
 			return 1;
 		}
 	}
@@ -119,7 +119,7 @@ addr_t alloc_mem(uint32_t size, struct pcb_t * proc) {
 	 * */
 	//TODO
 	proc->seg_table->size = 1 << SEGMENT_LEN;
-	int* avail_page =  (int*) malloc((num_pages+1) * sizeof(int));
+	int* avail_page =  (int*) malloc((num_pages) * sizeof(int));
 	int count=0; //count the number of empty pages
 	for(int i=0; i<NUM_PAGES; i++){
 		if(_mem_stat[i].proc == 0){
@@ -144,7 +144,7 @@ addr_t alloc_mem(uint32_t size, struct pcb_t * proc) {
 		 * 	  valid. */
 		//TODO
 		int i;
-		for(i=0; i<num_pages; i++){
+		for(i=0; i<num_pages; i++) {
 			_mem_stat[avail_page[i]].proc = proc->pid;
 			_mem_stat[avail_page[i]].index = i;
 			if(i == num_pages-1) _mem_stat[i].next = -1;
