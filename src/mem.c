@@ -1,4 +1,3 @@
-
 #include "mem.h"
 #include "stdlib.h"
 #include "string.h"
@@ -119,7 +118,7 @@ addr_t alloc_mem(uint32_t size, struct pcb_t * proc) {
 	 * */
 	//TODO
 	proc->seg_table->size = 1 << SEGMENT_LEN;
-	int* avail_page =  (int*) malloc((num_pages) * sizeof(int));
+	int* avail_page =  (int*) malloc((num_pages+1) * sizeof(int));
 	int count=0; //count the number of empty pages
 	for(int i=0; i<NUM_PAGES; i++){
 		if(_mem_stat[i].proc == 0){
@@ -147,8 +146,8 @@ addr_t alloc_mem(uint32_t size, struct pcb_t * proc) {
 		for(i=0; i<num_pages; i++) {
 			_mem_stat[avail_page[i]].proc = proc->pid;
 			_mem_stat[avail_page[i]].index = i;
-			if(i == num_pages-1) _mem_stat[i].next = -1;
-			_mem_stat[avail_page[i]].next = avail_page[i+1];
+			if(i == num_pages-1) _mem_stat[avail_page[i]].next = -1;
+			else _mem_stat[avail_page[i]].next = avail_page[i+1];
 
 			addr_t first_lv = get_first_lv(proc->bp);//virtual_addr = break pointer
 			addr_t second_lv = get_second_lv(proc->bp);
@@ -161,9 +160,9 @@ addr_t alloc_mem(uint32_t size, struct pcb_t * proc) {
 			proc->seg_table->table[first_lv].pages->table[second_lv].v_index = second_lv;
 			proc->seg_table->table[first_lv].pages->table[second_lv].p_index = avail_page[i];
 		}
-		_mem_stat[avail_page[i-1]].next = -1;
+		//_mem_stat[avail_page[i-1]].next = -1;
 	}
-	free(avail_page);
+	//free(avail_page);
 	pthread_mutex_unlock(&mem_lock);
 	return ret_mem;
 }
@@ -252,5 +251,3 @@ void dump(void) {
 		}
 	}
 }
-
-
