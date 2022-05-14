@@ -13,7 +13,8 @@ void enqueue(struct queue_t * q, struct pcb_t * proc) {
 		 q->size += 1;
 	 }
 	 else if (q->size == MAX_QUEUE_SIZE){
-		 // TODO: Neu het cho thi lam gi ta
+		 // TODO: Neu het cho thoat ra
+		 return;
 	 } 
 	 else{
 		 q->proc[q->size] = proc;
